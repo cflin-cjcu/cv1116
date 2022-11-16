@@ -1,13 +1,18 @@
 from FaceDetectionModule import FaceDetector
 import cv2
+import pafy
+url='https://www.youtube.com/watch?v=3kPH7kTphnE'
+videoPafy = pafy.new(url)
+best = videoPafy.getbest()
 
 # cap = cv2.VideoCapture(0)
-detector = FaceDetector(modelSelection=1,minDetectionCon=0.3)
-img = cv2.imread('./aaa.jpg')
-img, bboxs = detector.findFaces(img) ###########
+cap = cv2.VideoCapture(best.url)
+detector = FaceDetector()
 while True:
-    # success, img2 = cap.read()
-
+    success, img = cap.read()
+    img = cv2.resize(img,(1024,768))
+    img, bboxs = detector.findFaces(img) ###########
+    detector = FaceDetector(modelSelection=1,minDetectionCon=0.3)
     if bboxs:
         # bboxInfo - "id","bbox","score","center"
         center = bboxs[0]["center"]
@@ -17,5 +22,5 @@ while True:
     cv2.imshow("Image", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-# cap.release()
+cap.release()
 cv2.destroyAllWindows()

@@ -24,7 +24,7 @@ class FaceDetector:
         self.mpDraw = mp.solutions.drawing_utils
         self.faceDetection = self.mpFaceDetection.FaceDetection(model_selection=self.modelSelection, min_detection_confidence=self.minDetectionCon)
 
-    def findFaces(self, img, draw=True):
+    def findFaces(self, img, draw=False):
         """
         Find faces in an image and return the bbox info
         :param img: Image to find the faces in.
@@ -38,13 +38,16 @@ class FaceDetector:
         bboxs = []
         if self.results.detections:
             for id, detection in enumerate(self.results.detections):
+                # print(id,detection)
                 bboxC = detection.location_data.relative_bounding_box
+                kp0 = detection.location_data.relative_keypoints[0]
                 ih, iw, ic = img.shape
                 bbox = int(bboxC.xmin * iw), int(bboxC.ymin * ih), \
                        int(bboxC.width * iw), int(bboxC.height * ih)
+                kp = int(kp0.x * iw)-16, int(kp0.y*ih)-16
                 cx, cy = bbox[0] + (bbox[2] // 2), \
                          bbox[1] + (bbox[3] // 2)
-                bboxInfo = {"id": id, "bbox": bbox, "score": detection.score, "center": (cx, cy)}
+                bboxInfo = {"id": id, "bbox": bbox, "score": detection.score, "center": (cx,cy), "kp": kp}
                 bboxs.append(bboxInfo)
                 if draw:
                     img = cv2.rectangle(img, bbox, (255, 0, 255), 2)
